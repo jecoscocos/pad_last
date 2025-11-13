@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Агентство недвижимости{% endblock %}
+{% block content %}
+{% if current_user.is_authenticated %}
+	<div class="hero">
+		<h1>Добро пожаловать в агентство недвижимости</h1>
+		<p>Найдите свой идеальный дом в Молдове</p>
+	</div>
+	
+	<div class="card">
+		<h2>Наши объекты</h2>
+		<div class="property-grid">
+			{% for property in properties %}
+			<div class="property-card" onclick="location.href='{{ url_for('property_detail', property_id=property.id) }}'">
+				<div class="property-image">
+					{% if property.photos %}
+						<img src="{{ url_for('uploaded_file', filename=property.photos[0].file_path) }}" alt="{{ property.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+					{% else %}
+						<span>🏠</span>
+					{% endif %}
+				</div>
+				<div class="property-content">
+					<h3 class="property-title">{{ property.title }}</h3>
+					<div class="property-location">
+						📍 {{ property.city }}, {{ property.address }}
+					</div>
+					<div class="property-price">{{ property.price_eur }} €</div>
+					<div class="property-details">
+						{% if property.rooms %}
+						<span class="property-detail">🛏️ {{ property.rooms }} комн.</span>
+						{% endif %}
+						{% if property.area_m2 %}
+						<span class="property-detail">📐 {{ property.area_m2 }} м²</span>
+						{% endif %}
+						<span class="property-detail">{{ property.property_type }}</span>
+					</div>
+					<div class="property-actions">
+						<a href="{{ url_for('property_detail', property_id=property.id) }}" class="btn-primary">Подробнее</a>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+		
+		{% if not properties %}
+		<div class="text-center">
+			<p class="text-muted mb-3">Пока нет объектов недвижимости</p>
+			<a href="{{ url_for('new_property') }}" class="btn-primary">Добавить первый объект</a>
+		</div>
+		{% else %}
+		<div class="text-center mt-3">
+			<a href="{{ url_for('new_property') }}" class="btn-primary">Добавить новый объект</a>
+		</div>
+		{% endif %}
+	</div>
+{% else %}
+	<div class="hero">
+		<h1>Агентство недвижимости</h1>
+		<p>Найдите свой идеальный дом в Молдове</p>
+		<div style="margin-top: 2rem;">
+			<a href="{{ url_for('register') }}" class="btn-primary" style="margin-right: 1rem;">Регистрация</a>
+			<a href="{{ url_for('login') }}" class="btn-secondary">Войти</a>
+		</div>
+	</div>
+	
+	<div class="card">
+		<h2>Наши услуги</h2>
+		<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+			<div style="text-align: center; padding: 1.5rem; background: var(--secondary); border-radius: 12px;">
+				<h3>🏠 Продажа недвижимости</h3>
+				<p>Поможем продать вашу недвижимость по выгодной цене</p>
+			</div>
+			<div style="text-align: center; padding: 1.5rem; background: var(--secondary); border-radius: 12px;">
+				<h3>🔑 Аренда</h3>
+				<p>Найдем идеальную квартиру или дом для аренды</p>
+			</div>
+			<div style="text-align: center; padding: 1.5rem; background: var(--secondary); border-radius: 12px;">
+				<h3>📋 Консультации</h3>
+				<p>Профессиональные консультации по недвижимости</p>
+			</div>
+		</div>
+	</div>
+{% endif %}
+{% endblock %}

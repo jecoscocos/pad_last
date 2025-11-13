@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Проект: {{ project.name }}{% endblock %}
+{% block content %}
+<section class="card">
+	<h2>{{ project.name }}</h2>
+	<form action="{{ url_for('create_task', project_id=project.id) }}" method="post" class="stack">
+		<label>
+			<span>Заголовок</span>
+			<input name="title" required>
+		</label>
+		<label>
+			<span>Описание</span>
+			<textarea name="description" rows="3"></textarea>
+		</label>
+		<div class="grid2">
+			<label>
+				<span>Статус</span>
+				<select name="status">
+					<option value="todo">Запланировано</option>
+					<option value="in_progress">В работе</option>
+					<option value="done">Готово</option>
+				</select>
+			</label>
+			<label>
+				<span>Приоритет</span>
+				<select name="priority">
+					<option value="1">Высокий</option>
+					<option value="2" selected>Средний</option>
+					<option value="3">Низкий</option>
+				</select>
+			</label>
+			<label>
+				<span>Срок</span>
+				<input type="datetime-local" name="due_date">
+			</label>
+		</div>
+		<button type="submit">Добавить задачу</button>
+	</form>
+</section>
+
+<section class="card">
+	<h3>Задачи</h3>
+	{% if tasks %}
+		<ul class="tasks">
+			{% for t in tasks %}
+			<li class="task {{ 'done' if t.status == 'done' else '' }}">
+				<div class="task-main">
+					<strong>{{ t.title }}</strong>
+					<div class="muted">Статус: {{ t.status }}, Приоритет: {{ t.priority }}</div>
+					{% if t.due_date %}<div class="muted">Срок: {{ t.due_date.strftime('%d.%m.%Y %H:%M') }}</div>{% endif %}
+					{% if t.description %}<div>{{ t.description }}</div>{% endif %}
+				</div>
+				<div class="task-actions">
+					<form action="{{ url_for('toggle_task', task_id=t.id) }}" method="post">
+						<button type="submit">Переключить «Готово»</button>
+					</form>
+					<form action="{{ url_for('delete_task', task_id=t.id) }}" method="post" onsubmit="return confirm('Удалить задачу?')">
+						<button type="submit" class="danger">Удалить</button>
+					</form>
+				</div>
+			</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p class="muted">Задач пока нет.</p>
+	{% endif %}
+</section>
+{% endblock %}
+

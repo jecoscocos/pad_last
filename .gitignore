@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+*~
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Environment variables (ВАЖНО! Тут пароли)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# Docker
+docker-compose.override.yml
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+report.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node modules (если есть фронтенд)
+node_modules/
+package-lock.json
+yarn.lock

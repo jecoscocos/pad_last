@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Логи системы - Агентство недвижимости{% endblock %}
+{% block content %}
+<h2>📝 Логи системы</h2>
+
+<p class="muted">Последние 100 записей логов</p>
+
+{% if logs %}
+	<div style="background: #0f0f1e; padding: 1.5rem; border-radius: 12px; overflow-x: auto; margin-top: 1.5rem;">
+		<table class="log-table">
+			<thead>
+				<tr>
+					<th>Время</th>
+					<th>Уровень</th>
+					<th>Сервис</th>
+					<th>Сообщение</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for log in logs %}
+				<tr class="log-{{ log.level }}">
+					<td style="white-space: nowrap;">{{ log.timestamp }}</td>
+					<td><span class="badge badge-{{ log.level }}">{{ log.level }}</span></td>
+					<td><code>{{ log.service }}</code></td>
+					<td>{{ log.message }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% else %}
+	<p class="muted">Логов пока нет.</p>
+{% endif %}
+
+<style>
+.log-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.9em;
+}
+.log-table thead {
+	background: #1a1a2e;
+	position: sticky;
+	top: 0;
+}
+.log-table th {
+	padding: 0.75rem;
+	text-align: left;
+	font-weight: 600;
+	color: #4facfe;
+	border-bottom: 2px solid #2a2a40;
+}
+.log-table td {
+	padding: 0.5rem 0.75rem;
+	border-top: 1px solid #1a1a2e;
+}
+.log-table tbody tr:hover {
+	background: #1a1a2e;
+}
+.badge {
+	padding: 0.25rem 0.5rem;
+	border-radius: 4px;
+	font-size: 0.85em;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+.badge-info {
+	background: #3b82f6;
+	color: white;
+}
+.badge-warning {
+	background: #f59e0b;
+	color: white;
+}
+.badge-error {
+	background: #ef4444;
+	color: white;
+}
+.badge-debug {
+	background: #6b7280;
+	color: white;
+}
+code {
+	background: #1a1a2e;
+	padding: 0.25rem 0.5rem;
+	border-radius: 4px;
+	color: #4ade80;
+}
+</style>
+{% endblock %}

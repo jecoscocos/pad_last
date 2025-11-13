@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Платежи - Агентство недвижимости{% endblock %}
+{% block content %}
+<div class="card">
+	<h2 style="margin-bottom: 2rem;">💳 {% if current_user.role == 'agent' %}Все платежи{% else %}Мои платежи{% endif %}</h2>
+
+	{% if current_user.role != 'agent' %}
+	<div style="margin-bottom: 2rem;">
+		<button onclick="togglePaymentForm()" class="btn-primary">➕ Создать платёж</button>
+	</div>
+
+	<div id="payment-form" style="display: none; background: rgba(255, 255, 255, 0.6); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 2px solid var(--border);">
+		<h3 style="margin-bottom: 1.5rem;">Новый платёж</h3>
+		<form method="POST" action="{{ url_for('create_payment') }}" class="stack">
+			<label>
+				<span>Сумма (EUR):</span>
+				<input type="number" name="amount" step="0.01" required placeholder="100.00">
+			</label>
+			<label>
+				<span>ID объекта (опционально):</span>
+				<input type="number" name="property_id" placeholder="Например: 5">
+			</label>
+			<button type="submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">💰 Оплатить</button>
+		</form>
+	</div>
+	{% endif %}
+
+	<h3 style="margin-bottom: 1.5rem;">История транзакций</h3>
+	{% if transactions %}
+		<div style="overflow-x: auto;">
+			<table class="report-table">
+				<thead>
+					<tr>
+						<th>ID транзакции</th>
+						{% if current_user.role == 'agent' %}
+						<th>User ID</th>
+						{% endif %}
+						<th>Сумма</th>
+						<th>Валюта</th>
+						<th>Статус</th>
+						<th>ID объекта</th>
+						<th>Дата</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for txn in transactions %}
+					<tr>
+						<td><code style="background: var(--secondary); padding: 0.25rem 0.5rem; border-radius: 6px; color: var(--primary); font-weight: 600;">{{ txn.transaction_id or txn.get('id', 'N/A') }}</code></td>
+						{% if current_user.role == 'agent' %}
+						<td><span style="background: #e8f4f8; padding: 0.25rem 0.75rem; border-radius: 6px; color: #0066cc; font-weight: 600;">{{ txn.user_id }}</span></td>
+						{% endif %}
+						<td><strong style="color: var(--accent); font-size: 1.1rem;">{{ "%.2f"|format(txn.amount) }} €</strong></td>
+						<td>{{ txn.currency or 'EUR' }}</td>
+						<td>
+							{% if txn.status == 'success' %}
+								<span class="badge" style="background: #10b981;">✅ Успешно</span>
+							{% elif txn.status == 'pending' %}
+								<span class="badge" style="background: #f59e0b;">⏳ В обработке</span>
+							{% else %}
+								<span class="badge" style="background: #ef4444;">❌ Ошибка</span>
+							{% endif %}
+						</td>
+						<td>{{ txn.property_id if txn.property_id else '—' }}</td>
+						<td>{{ txn.created_at }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% else %}
+		<div style="text-align: center; padding: 3rem; color: var(--text-muted); background: var(--secondary); border-radius: 12px;">
+			<span style="font-size: 3rem;">💳</span>
+			<p style="margin-top: 1rem; font-size: 1.1rem;">{% if current_user.role == 'agent' %}Транзакций пока нет{% else %}У вас пока нет транзакций{% endif %}</p>
+			{% if current_user.role != 'agent' %}
+			<p style="font-size: 0.9rem;">Создайте первый платёж, нажав кнопку выше</p>
+			{% endif %}
+		</div>
+	{% endif %}
+</div>
+
+<script>
+function togglePaymentForm() {
+	const form = document.getElementById('payment-form');
+	if (form.style.display === 'none') {
+		form.style.display = 'block';
+		form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+	} else {
+		form.style.display = 'none';
+	}
+}
+</script>
+{% endblock %}

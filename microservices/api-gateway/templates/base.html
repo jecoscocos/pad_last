@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{% block title %}Агентство недвижимости{% endblock %}</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<header class="container nav">
+		<h1><a href="{{ url_for('index') }}">🏠 Агентство</a></h1>
+		<nav style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+			   {% if current_user.is_authenticated %}
+		   <a href="{{ url_for('index') }}">Объекты</a>
+		   {% if current_user.role == 'agent' %}
+			   <a href="{{ url_for('new_property') }}">Добавить</a>
+			   <a href="{{ url_for('all_inquiries') }}">Заявки</a>
+			   <a href="{{ url_for('appointments') }}">Календарь</a>
+			   <a href="{{ url_for('analytics') }}">Аналитика</a>
+			   <a href="{{ url_for('reports') }}">Отчёты</a>
+		   {% endif %}
+				   {% if current_user.role == 'user' or current_user.role == 'admin' %}
+					   <a href="{{ url_for('my_inquiries') }}">Мои заявки</a>
+				   {% endif %}
+				   <a href="{{ url_for('list_notifications') }}">🔔 Уведомления</a>
+				   <a href="{{ url_for('my_payments') }}">Платежи</a>
+				   <span class="muted" style="font-size: 0.85rem;">{{ current_user.email }}</span>
+				   <a href="{{ url_for('logout') }}" style="background: rgba(239, 68, 68, 0.1); color: #dc2626;">Выйти</a>
+			   {% else %}
+				   <a href="{{ url_for('login') }}">Войти</a>
+				   <a href="{{ url_for('register') }}">Регистрация</a>
+			   {% endif %}
+		</nav>
+	</header>
+	<main class="container">
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				{% for category, message in messages %}
+					<div class="alert alert-{{ category }}">{{ message }}</div>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+		{% block content %}{% endblock %}
+	</main>
+	<footer style="text-align: center; padding: 2rem 0; color: rgba(255, 255, 255, 0.7); margin-top: 4rem;">
+		<small>🏠 Агентство недвижимости Молдовы • Flask • Docker • Микросервисная архитектура (12 сервисов)</small>
+	</footer>
+	
+	<script>
+	// Аналитика: автоматический трекинг просмотров страниц
+	{% if current_user.is_authenticated %}
+	document.addEventListener('DOMContentLoaded', function() {
+		fetch('/analytics/track', {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				event_type: 'page_view',
+				page: window.location.pathname
+			})
+		}).catch(err => console.log('Analytics error:', err));
+	});
+	{% endif %}
+	</script>
+</body>
+</html>

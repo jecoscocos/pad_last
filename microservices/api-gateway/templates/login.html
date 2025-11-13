@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Войти{% endblock %}
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto; padding: 2rem 0;">
+	<section class="card">
+		<div style="text-align: center; margin-bottom: 2rem;">
+			<h2 style="color: var(--text); margin-bottom: 0.5rem;">Добро пожаловать!</h2>
+			<p style="color: var(--text-muted);">Войдите в свой аккаунт агентства недвижимости</p>
+		</div>
+		
+		<form method="post" class="stack">
+			<label>
+				<span>Email адрес</span>
+				<input type="email" name="email" required placeholder="your@email.com">
+			</label>
+			<label>
+				<span>Пароль</span>
+				<input type="password" name="password" required placeholder="Введите пароль">
+			</label>
+			<button type="submit">Войти в систему</button>
+		</form>
+		
+		<div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+			<p style="color: var(--text-muted); margin-bottom: 1rem;">Нет аккаунта?</p>
+			<a href="{{ url_for('register') }}" class="btn-secondary">Создать аккаунт</a>
+		</div>
+	</section>
+</div>
+{% endblock %}

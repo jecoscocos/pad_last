@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Уведомления - Агентство недвижимости{% endblock %}
+{% block content %}
+<div class="card">
+	<h2 style="margin-bottom: 2rem;">🔔 Уведомления</h2>
+
+	{% if notifications %}
+		<div style="display: flex; flex-direction: column; gap: 1rem;">
+			{% for notif in notifications %}
+			<div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%); padding: 1.5rem; border-radius: 12px; border-left: 4px solid {% if notif.channel == 'email' %}#3b82f6{% elif notif.channel == 'sms' %}#10b981{% else %}#f59e0b{% endif %}; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+				<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+					<div style="display: flex; align-items: center; gap: 0.75rem;">
+						<span style="font-size: 1.5rem;">
+							{% if notif.channel == 'email' %}📧
+							{% elif notif.channel == 'sms' %}📱
+							{% else %}🔔
+							{% endif %}
+						</span>
+						<div>
+							<div style="font-weight: 600; color: var(--text);">{{ notif.recipient }}</div>
+							<div style="font-size: 0.85rem; color: var(--text-muted);">
+								<span style="background: {% if notif.channel == 'email' %}#dbeafe{% elif notif.channel == 'sms' %}#d1fae5{% else %}#fef3c7{% endif %}; color: {% if notif.channel == 'email' %}#1e40af{% elif notif.channel == 'sms' %}#065f46{% else %}#92400e{% endif %}; padding: 0.25rem 0.75rem; border-radius: 8px; font-weight: 600;">
+									{{ notif.channel }}
+								</span>
+							</div>
+						</div>
+					</div>
+					<div style="text-align: right; color: var(--text-muted); font-size: 0.85rem;">
+						{{ notif.created_at }}
+					</div>
+				</div>
+				<div style="color: var(--text); line-height: 1.6; padding-left: 2.25rem;">
+					{{ notif.message }}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		<div style="text-align: center; padding: 3rem; color: var(--text-muted); background: var(--secondary); border-radius: 12px;">
+			<span style="font-size: 3rem;">🔔</span>
+			<p style="margin-top: 1rem; font-size: 1.1rem;">Уведомлений пока нет</p>
+			<p style="font-size: 0.9rem;">Уведомления появятся здесь, когда клиенты создадут заявки</p>
+		</div>
+	{% endif %}
+</div>
+{% endblock %}

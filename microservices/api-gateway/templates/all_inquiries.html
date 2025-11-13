@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Заявки на объекты{% endblock %}
+{% block content %}
+<section class="card">
+    <h2>Все заявки на объекты</h2>
+    {% if inquiries %}
+        <ul class="tasks">
+            {% for inquiry in inquiries %}
+            <li class="task">
+                <strong>{{ inquiry.get('property', {}).get('title', 'Объект не найден') }}</strong>
+                <div class="muted">{{ inquiry['name'] }} • {{ inquiry['email'] }} • {{ inquiry.get('phone', 'N/A') }}</div>
+                <div>{{ inquiry.get('message', 'Без сообщения') }}</div>
+                <div class="muted">{{ inquiry['created_at'] }}</div>
+                <form action="{{ url_for('change_inquiry_status', inquiry_id=inquiry['id']) }}" method="post" style="margin-top:0.5rem;">
+                    <label>Статус:
+                        <select name="status">
+                            <option value="new" {% if inquiry['status'] == 'new' %}selected{% endif %}>Новая</option>
+                            <option value="in_progress" {% if inquiry['status'] == 'in_progress' %}selected{% endif %}>В работе</option>
+                            <option value="done" {% if inquiry['status'] == 'done' %}selected{% endif %}>Завершена</option>
+                            <option value="rejected" {% if inquiry['status'] == 'rejected' %}selected{% endif %}>Отклонена</option>
+                        </select>
+                    </label>
+                    <button type="submit">Сохранить</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="muted">Заявок пока нет.</p>
+    {% endif %}
+</section>
+{% endblock %}

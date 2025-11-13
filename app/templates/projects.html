@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Мои проекты{% endblock %}
+{% block content %}
+<section class="card">
+	<h2>Создать проект</h2>
+	<form action="{{ url_for('create_project') }}" method="post" class="stack">
+		<label>
+			<span>Название проекта</span>
+			<input name="name" placeholder="Например, CRM 2025" required>
+		</label>
+		<button type="submit">Создать</button>
+	</form>
+</section>
+
+<section class="card">
+	<h2>Мои проекты</h2>
+	{% if projects %}
+		<ul class="tasks">
+			{% for p in projects %}
+			<li class="task">
+				<div class="task-main">
+					<strong><a href="{{ url_for('view_project', project_id=p.id) }}">{{ p.name }}</a></strong>
+					<div class="muted">Создан: {{ p.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+				</div>
+			</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p class="muted">Проектов пока нет.</p>
+	{% endif %}
+</section>
+{% endblock %}
+

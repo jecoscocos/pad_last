@@ -1,0 +1,102 @@
+
+{% extends 'base.html' %}
+{% block title %}Объекты недвижимости{% endblock %}
+{% block content %}
+
+<!-- Поисковая панель -->
+<div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);">
+	<h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+		🔍 Поиск недвижимости
+	</h2>
+	<form method="get" action="{{ url_for('index') }}" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+		<div>
+			<label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text);">🏙️ Город</label>
+			<input type="text" name="city" placeholder="Кишинёв, Бельцы..." value="{{ request.args.get('city', '') }}" 
+				   style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem;">
+		</div>
+		<div>
+			<label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text);">🏠 Тип</label>
+			<select name="property_type" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem;">
+				<option value="">Все типы</option>
+				<option value="apartment" {% if request.args.get('property_type') == 'apartment' %}selected{% endif %}>Квартира</option>
+				<option value="house" {% if request.args.get('property_type') == 'house' %}selected{% endif %}>Дом</option>
+				<option value="commercial" {% if request.args.get('property_type') == 'commercial' %}selected{% endif %}>Коммерция</option>
+				<option value="land" {% if request.args.get('property_type') == 'land' %}selected{% endif %}>Земля</option>
+			</select>
+		</div>
+		<div>
+			<label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text);">💰 Макс. цена (€)</label>
+			<input type="number" name="max_price" placeholder="100000" value="{{ request.args.get('max_price', '') }}" 
+				   style="width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem;">
+		</div>
+		<div style="display: flex; gap: 0.5rem;">
+			<button type="submit" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 0.75rem 2rem; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+				🔍 Искать
+			</button>
+			<a href="{{ url_for('index') }}" style="background: white; color: var(--text-muted); padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 10px; font-weight: 600; text-decoration: none; display: flex; align-items: center;">
+				✕
+			</a>
+		</div>
+	</form>
+</div>
+
+{% if current_user.is_authenticated and current_user.role == 'agent' %}
+<section class="card" style="margin-bottom:2rem;">
+   <h2 style="margin-bottom:1rem;">Добавить объект</h2>
+   <a class="button" href="{{ url_for('new_property') }}">➕ Новый объект</a>
+</section>
+{% endif %}
+
+<section class="card" style="background: var(--secondary);">
+   <h2 style="margin-bottom:2rem;">Каталог недвижимости</h2>
+   {% if properties %}
+   <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:2rem;">
+	   {% for p in properties %}
+	   <div class="property-card" style="background:white; border-radius:16px; box-shadow:0 4px 24px rgba(0,0,0,0.08); overflow:hidden; display:flex; flex-direction:column;">
+		   {% if p.photos and p.photos|length > 0 %}
+			   <a href="{{ url_for('property_detail', property_id=p.id) }}">
+				   <img src="{{ url_for('uploaded_file', filename=p.photos[0].file_path) }}" alt="Фото объекта" style="width:100%; height:220px; object-fit:cover;">
+			   </a>
+		   {% else %}
+			   <div style="width:100%; height:220px; background:#f3f4f6; display:flex; align-items:center; justify-content:center; color:#bbb; font-size:4rem;">
+				   🏠
+			   </div>
+		   {% endif %}
+	   <div style="padding:1.5rem; flex:1; display:flex; flex-direction:column;">
+		   <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:0.5rem;">
+			   <h3 style="margin:0; font-size:1.3rem; color:var(--primary);">
+				   <a href="{{ url_for('property_detail', property_id=p.id) }}" style="text-decoration:none; color:inherit;">{{ p.title }}</a>
+			   </h3>
+			   <span style="background:#e8f4f8; color:#0066cc; padding:0.25rem 0.75rem; border-radius:8px; font-size:0.85rem; font-weight:600; white-space:nowrap; margin-left:0.5rem;">
+				   ID: {{ p.id }}
+			   </span>
+		   </div>
+		   <div style="color:var(--text-muted); margin-bottom:0.5rem;">
+			   {{ p.city }}, {{ p.address }}
+			   </div>
+			   <div style="font-size:1.2rem; font-weight:600; color:var(--accent); margin-bottom:0.5rem;">
+				   {{ '%.0f' % p.price_eur }} €
+			   </div>
+			   <div style="margin-bottom:0.5rem;">
+				   <span style="background:var(--primary); color:white; padding:0.3rem 0.8rem; border-radius:12px; font-size:0.9rem; margin-right:0.5rem;">{{ p.property_type }}</span>
+				   {% if p.area_m2 %}<span style="color:var(--text-muted);">📐 {{ '%.1f' % p.area_m2 }} м²</span>{% endif %}
+				   {% if p.rooms %}<span style="color:var(--text-muted); margin-left:0.5rem;">🛏️ {{ p.rooms }} комн.</span>{% endif %}
+			   </div>
+			   <div style="margin-bottom:0.5rem;">
+				   {% if p.is_for_sale %}<span style="background:var(--accent); color:white; padding:0.3rem 0.8rem; border-radius:12px; font-size:0.9rem; margin-right:0.5rem;">Продажа</span>{% endif %}
+				   {% if p.is_for_rent %}<span style="background:var(--primary-dark); color:white; padding:0.3rem 0.8rem; border-radius:12px; font-size:0.9rem;">Аренда</span>{% endif %}
+			   </div>
+			   {% if p.description %}
+			   <div style="color:var(--text-muted); font-size:0.95rem; margin-bottom:0.5rem;">{{ p.description[:80] }}{% if p.description|length > 80 %}...{% endif %}</div>
+			   {% endif %}
+			   <a href="{{ url_for('property_detail', property_id=p.id) }}" class="button" style="margin-top:auto;">Подробнее</a>
+		   </div>
+	   </div>
+	   {% endfor %}
+   </div>
+   {% else %}
+	   <p class="muted">Пока нет объектов.</p>
+   {% endif %}
+</section>
+{% endblock %}
+

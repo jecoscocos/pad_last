@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  test-auth:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    command: python -m pytest test_auth.py -v --cov=app --cov-report=term
+    environment:
+      - TESTING=true
+      - SQLALCHEMY_DATABASE_URI=sqlite:///:memory:
+    volumes:
+      - ./auth-service:/app
+    networks:
+      - test-network
+
+  test-property:
+    build:
+      context: ./property-service
+      dockerfile: Dockerfile
+    command: python -m pytest test_property.py -v --cov=app --cov-report=term
+    environment:
+      - TESTING=true
+      - SQLALCHEMY_DATABASE_URI=sqlite:///:memory:
+    volumes:
+      - ./property-service:/app
+    networks:
+      - test-network
+
+  test-notification:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    command: python -m pytest test_notification.py -v --cov=app --cov-report=term
+    environment:
+      - TESTING=true
+      - SQLALCHEMY_DATABASE_URI=sqlite:///:memory:
+    volumes:
+      - ./notification-service:/app
+    networks:
+      - test-network
+
+  test-analytics:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    command: python -m pytest test_analytics.py -v --cov=app --cov-report=term
+    environment:
+      - TESTING=true
+      - SQLALCHEMY_DATABASE_URI=sqlite:///:memory:
+    volumes:
+      - ./analytics-service:/app
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

@@ -1,0 +1,290 @@
+services:
+  # Auth Service - Authentication and User Management
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=sqlite:///auth.db
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5006
+      - PORT=5001
+    volumes:
+      - auth-data:/app
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Property Service - Real Estate Management
+  property-service:
+    build: ./property-service
+    container_name: property-service
+    ports:
+      - "5002:5002"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=sqlite:///property.db
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5006
+      - UPLOAD_FOLDER=/app/uploads
+      - PORT=5002
+    volumes:
+      - property-data:/app
+      - property-uploads:/app/uploads
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5002/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Inquiry Service - Client Inquiries and Appointments
+  inquiry-service:
+    build: ./inquiry-service
+    container_name: inquiry-service
+    ports:
+      - "5003:5003"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=sqlite:///inquiry.db
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - PROPERTY_SERVICE_URL=http://property-service:5002
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5006
+      - PORT=5003
+    volumes:
+      - inquiry-data:/app
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+      - property-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5003/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Project Service - Project and Task Management
+  project-service:
+    build: ./project-service
+    container_name: project-service
+    ports:
+      - "5004:5004"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=sqlite:///project.db
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - PORT=5004
+    volumes:
+      - project-data:/app
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5004/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Search Service - Lightweight search/index for properties
+  search-service:
+    build: ./search-service
+    container_name: search-service
+    ports:
+      - "5005:5005"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - PROPERTY_SERVICE_URL=http://property-service:5002
+      - PORT=5005
+    networks:
+      - microservices-network
+    depends_on:
+      - property-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5005/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Notification Service - mock notifications (email/sms) storage
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "5006:5006"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - PORT=5006
+    volumes:
+      - notification-data:/app
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5006/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Analytics Service - Track views, stats
+  analytics-service:
+    build: ./analytics-service
+    container_name: analytics-service
+    ports:
+      - "5007:5007"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=sqlite:///analytics.db
+      - PORT=5007
+    volumes:
+      - analytics-data:/app
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5007/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Reporting Service - Generate reports
+  reporting-service:
+    build: ./reporting-service
+    container_name: reporting-service
+    ports:
+      - "5008:5008"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - PROPERTY_SERVICE_URL=http://property-service:5002
+      - INQUIRY_SERVICE_URL=http://inquiry-service:5003
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - PORT=5008
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+      - property-service
+      - inquiry-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5008/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Payment Service - Mock payment processing
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "5009:5009"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=sqlite:///payment.db
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5006
+      - PORT=5009
+    volumes:
+      - payment-data:/app
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5009/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Media Service - Image processing/optimization
+  media-service:
+    build: ./media-service
+    container_name: media-service
+    ports:
+      - "5010:5010"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - UPLOAD_FOLDER=/app/media
+      - PORT=5010
+    volumes:
+      - media-data:/app/media
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5010/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Logging Service - Centralized logging
+  logging-service:
+    build: ./logging-service
+    container_name: logging-service
+    ports:
+      - "5011:5011"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=sqlite:///logs.db
+      - PORT=5011
+    volumes:
+      - logging-data:/app
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5011/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API Gateway - Single Entry Point
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - PROPERTY_SERVICE_URL=http://property-service:5002
+      - INQUIRY_SERVICE_URL=http://inquiry-service:5003
+      - PROJECT_SERVICE_URL=http://project-service:5004
+      - SEARCH_SERVICE_URL=http://search-service:5005
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5006
+      - ANALYTICS_SERVICE_URL=http://analytics-service:5007
+      - REPORTING_SERVICE_URL=http://reporting-service:5008
+      - PAYMENT_SERVICE_URL=http://payment-service:5009
+      - MEDIA_SERVICE_URL=http://media-service:5010
+      - LOGGING_SERVICE_URL=http://logging-service:5011
+      - PORT=5000
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+      - property-service
+      - inquiry-service
+      - project-service
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  auth-data:
+  property-data:
+  property-uploads:
+  inquiry-data:
+  project-data:
+  notification-data:
+  analytics-data:
+  payment-data:
+  media-data:
+  logging-data:

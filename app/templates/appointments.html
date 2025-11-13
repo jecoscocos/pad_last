@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Календарь показов{% endblock %}
+{% block content %}
+<div class="calendar-container">
+	<h2 style="margin-bottom: 2rem; color: var(--text);">📅 Календарь показов</h2>
+	
+	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+		<div>
+			<div class="card" style="margin-bottom: 0;">
+				<h3 style="margin-bottom: 1.5rem;">Запланировать показ</h3>
+				<form method="post" class="stack">
+					<label>
+						<span>Объект недвижимости *</span>
+						<select name="property_id" required>
+							<option value="">Выберите объект</option>
+							{% for prop in properties %}
+								<option value="{{ prop.id }}">{{ prop.title }} - {{ prop.city }}</option>
+							{% endfor %}
+						</select>
+					</label>
+					
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+						<label>
+							<span>Имя клиента *</span>
+							<input name="client_name" required placeholder="Иван Иванов">
+						</label>
+						<label>
+							<span>Телефон</span>
+							<input type="tel" name="client_phone" placeholder="+373 XX XXX XXX">
+						</label>
+					</div>
+					
+					<label>
+						<span>Email клиента</span>
+						<input type="email" name="client_email" placeholder="client@email.com">
+					</label>
+					
+					<label>
+						<span>Дата и время показа *</span>
+						<input type="datetime-local" name="scheduled_at" required>
+					</label>
+					
+					<label>
+						<span>Примечание</span>
+						<textarea name="note" rows="3" placeholder="Дополнительная информация о показе"></textarea>
+					</label>
+					
+					<button type="submit">Запланировать показ</button>
+				</form>
+			</div>
+		</div>
+		
+		<div>
+			<div class="card" style="margin-bottom: 0;">
+				<h3 style="margin-bottom: 1.5rem;">Запланированные показы</h3>
+				{% if appointments %}
+					<div style="max-height: 500px; overflow-y: auto;">
+						{% for apt in appointments %}
+						<div class="appointment-item">
+							<div class="appointment-time">
+								📅 {{ apt.scheduled_at.strftime('%d.%m.%Y в %H:%M') }}
+							</div>
+							<div class="appointment-property">
+								🏠 {{ apt.property.title }}
+							</div>
+							<div class="appointment-client">
+								👤 {{ apt.client.name }}
+								{% if apt.client.phone %} • {{ apt.client.phone }}{% endif %}
+								{% if apt.client.email %} • {{ apt.client.email }}{% endif %}
+							</div>
+							{% if apt.note %}
+							<div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(255, 255, 255, 0.5); border-radius: 8px; font-size: 0.9rem; color: var(--text-muted);">
+								💬 {{ apt.note }}
+							</div>
+							{% endif %}
+						</div>
+						{% endfor %}
+					</div>
+				{% else %}
+					<div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+						<span style="font-size: 3rem;">📅</span>
+						<p style="margin-top: 1rem;">Показов не запланировано</p>
+						<p style="font-size: 0.9rem;">Запланируйте первый показ слева</p>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

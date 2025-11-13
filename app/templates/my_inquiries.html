@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Мои заявки{% endblock %}
+{% block content %}
+<section class="card">
+    <h2>Мои заявки</h2>
+    {% if inquiries %}
+        <ul class="tasks">
+            {% for inquiry in inquiries %}
+            <li class="task">
+                <strong>{{ inquiry.property.title }}</strong>
+                <div class="muted">{{ inquiry.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+                <div>{{ inquiry.message or 'Без сообщения' }}</div>
+                <div>Статус: <span style="font-weight:600">{{ inquiry.status }}</span></div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="muted">У вас нет заявок.</p>
+    {% endif %}
+</section>
+{% endblock %}

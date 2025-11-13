@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Мои заявки{% endblock %}
+{% block content %}
+<section class="card">
+    <h2>Мои заявки</h2>
+    {% if inquiries %}
+        <ul class="tasks">
+            {% for inquiry in inquiries %}
+            <li class="task">
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <div style="flex:1;">
+                        <strong>Заявка #{{ inquiry.id }} - Объект #{{ inquiry.property_id }}</strong>
+                        <div class="muted">Создано: {{ inquiry.created_at }}</div>
+                        <div><strong>Имя:</strong> {{ inquiry.name }}</div>
+                        <div><strong>Email:</strong> {{ inquiry.email or 'Не указан' }}</div>
+                        <div><strong>Телефон:</strong> {{ inquiry.phone or 'Не указан' }}</div>
+                        <div><strong>Сообщение:</strong> {{ inquiry.message or 'Без сообщения' }}</div>
+                        <div>Статус: <span style="font-weight:600; color: {% if inquiry.status == 'new' %}#3498db{% elif inquiry.status == 'in_progress' %}#f39c12{% elif inquiry.status == 'done' %}#27ae60{% else %}#e74c3c{% endif %}">{{ inquiry.status }}</span></div>
+                    </div>
+                    <div>
+                        <form method="POST" action="{{ url_for('delete_inquiry', inquiry_id=inquiry.id) }}" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить эту заявку?');">
+                            <button type="submit" style="background:#e74c3c; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-size:0.9rem;">
+                                🗑️ Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="muted">У вас нет заявок.</p>
+    {% endif %}
+</section>
+{% endblock %}

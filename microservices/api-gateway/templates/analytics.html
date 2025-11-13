@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Аналитика - Агентство недвижимости{% endblock %}
+{% block content %}
+<h2>📊 Аналитика</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+	<div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem;">
+		<h3 style="margin: 0 0 0.5rem 0; font-size: 2.5rem;">{{ stats.get('total_views', 0) }}</h3>
+		<p style="margin: 0; opacity: 0.9;">Всего просмотров</p>
+	</div>
+	
+	<div class="card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem;">
+		<h3 style="margin: 0 0 0.5rem 0; font-size: 2.5rem;">{{ stats.get('unique_users', 0) }}</h3>
+		<p style="margin: 0; opacity: 0.9;">Уникальных пользователей</p>
+	</div>
+	
+	<div class="card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 1.5rem;">
+		<h3 style="margin: 0 0 0.5rem 0; font-size: 2.5rem;">{{ stats.get('total_events', 0) }}</h3>
+		<p style="margin: 0; opacity: 0.9;">Всего событий</p>
+	</div>
+</div>
+
+<h3>📈 Последние события</h3>
+{% if events %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Тип события</th>
+				<th>Пользователь</th>
+				<th>Дата</th>
+				<th>Данные</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for event in events %}
+			<tr>
+				<td><strong>{{ event.event_type }}</strong></td>
+				<td>{{ event.user_id if event.user_id else 'Анонимный' }}</td>
+				<td>{{ event.created_at }}</td>
+				<td style="font-size: 0.9em; color: #888;">{{ event.metadata }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	<p class="muted">Событий пока нет.</p>
+{% endif %}
+
+<style>
+.card {
+	border-radius: 12px;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 1rem;
+	background: #1a1a2e;
+	border-radius: 8px;
+	overflow: hidden;
+}
+.table thead {
+	background: #16213e;
+}
+.table th {
+	padding: 1rem;
+	text-align: left;
+	font-weight: 600;
+	color: #4facfe;
+}
+.table td {
+	padding: 0.75rem 1rem;
+	border-top: 1px solid #2a2a40;
+}
+.table tbody tr:hover {
+	background: #252540;
+}
+</style>
+{% endblock %}

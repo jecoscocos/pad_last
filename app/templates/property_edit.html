@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать объект{% endblock %}
+{% block content %}
+<section class="card">
+    <h2>Редактировать объект недвижимости</h2>
+    <form method="post" class="stack">
+        <label>
+            <span>Название объекта *</span>
+            <input name="title" required value="{{ p.title }}">
+        </label>
+        <label>
+            <span>Описание</span>
+            <textarea name="description" rows="4">{{ p.description }}</textarea>
+        </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <label>
+                <span>Город *</span>
+                <input name="city" required value="{{ p.city }}">
+            </label>
+            <label>
+                <span>Адрес *</span>
+                <input name="address" required value="{{ p.address }}">
+            </label>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <label>
+                <span>Цена, € *</span>
+                <input type="number" step="0.01" name="price_eur" required value="{{ p.price_eur }}">
+            </label>
+            <label>
+                <span>Тип объекта</span>
+                <select name="property_type">
+                    <option value="apartment" {% if p.property_type == 'apartment' %}selected{% endif %}>🏠 Квартира</option>
+                    <option value="house" {% if p.property_type == 'house' %}selected{% endif %}>🏡 Дом</option>
+                    <option value="land" {% if p.property_type == 'land' %}selected{% endif %}>🌳 Земля</option>
+                    <option value="commercial" {% if p.property_type == 'commercial' %}selected{% endif %}>🏢 Коммерческая</option>
+                </select>
+            </label>
+            <label>
+                <span>Комнат</span>
+                <input type="number" name="rooms" value="{{ p.rooms }}">
+            </label>
+        </div>
+        <label>
+            <span>Площадь, м²</span>
+            <input type="number" step="0.1" name="area_m2" value="{{ p.area_m2 }}">
+        </label>
+        <div style="display: flex; gap: 2rem;">
+            <label><input type="checkbox" name="is_for_sale" {% if p.is_for_sale %}checked{% endif %}> Продажа</label>
+            <label><input type="checkbox" name="is_for_rent" {% if p.is_for_rent %}checked{% endif %}> Аренда</label>
+        </div>
+        <button type="submit">Сохранить изменения</button>
+    </form>
+</section>
+{% endblock %}
