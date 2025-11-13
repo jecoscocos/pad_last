@@ -1,6 +1,6 @@
 import unittest
 import json
-from app import app, db, Log
+from app import app, db, LogEntry
 
 class TestLoggingService(unittest.TestCase):
     def setUp(self):
@@ -42,8 +42,8 @@ class TestLoggingService(unittest.TestCase):
         """Тест получения логов"""
         # Создаем тестовый лог
         with app.app_context():
-            log = Log(
-                service_name='test-service',
+            log = LogEntry(
+                service='test-service',
                 level='INFO',
                 message='Test message'
             )
@@ -59,8 +59,8 @@ class TestLoggingService(unittest.TestCase):
     def test_get_logs_by_service(self):
         """Тест получения логов по сервису"""
         with app.app_context():
-            log = Log(
-                service_name='auth-service',
+            log = LogEntry(
+                service='auth-service',
                 level='INFO',
                 message='Test'
             )
@@ -75,8 +75,8 @@ class TestLoggingService(unittest.TestCase):
     def test_get_logs_by_level(self):
         """Тест получения логов по уровню"""
         with app.app_context():
-            log = Log(
-                service_name='test-service',
+            log = LogEntry(
+                service='test-service',
                 level='ERROR',
                 message='Error message'
             )
