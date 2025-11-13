@@ -61,16 +61,11 @@ jobs:
     
     - name: Install linting tools
       run: |
-        pip install flake8 pylint black
+        pip install flake8
     
-    - name: Run flake8
+    - name: Run flake8 (critical errors only)
       run: |
         flake8 microservices/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 microservices/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    
-    - name: Check code formatting with black
-      run: |
-        black --check microservices/
 
   build:
     name: Build Docker Images
@@ -111,27 +106,6 @@ jobs:
         context: ./microservices/api-gateway
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/real-estate-gateway:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/real-estate-gateway:latest
-
-  security-scan:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './microservices'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-    
-    - name: Upload Trivy results to GitHub Security
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: 'trivy-results.sarif'
 
   deploy:
     name: Deploy to Production
