@@ -1,6 +1,12 @@
 import unittest
 import json
 import io
+import os
+import tempfile
+
+# Создаем временную директорию перед импортом app
+os.environ['UPLOAD_FOLDER'] = tempfile.mkdtemp()
+
 from app import app, db, Media
 
 class TestMediaService(unittest.TestCase):

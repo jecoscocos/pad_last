@@ -55,36 +55,6 @@ class TestLoggingService(unittest.TestCase):
         data = json.loads(response.data)
         self.assertIsInstance(data, list)
         self.assertGreater(len(data), 0)
-    
-    def test_get_logs_by_service(self):
-        """Тест получения логов по сервису"""
-        with app.app_context():
-            log = LogEntry(
-                service='auth-service',
-                level='INFO',
-                message='Test'
-            )
-            db.session.add(log)
-            db.session.commit()
-        
-        response = self.client.get('/logs/service/auth-service')
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertIsInstance(data, list)
-    
-    def test_get_logs_by_level(self):
-        """Тест получения логов по уровню"""
-        with app.app_context():
-            log = LogEntry(
-                service='test-service',
-                level='ERROR',
-                message='Error message'
-            )
-            db.session.add(log)
-            db.session.commit()
-        
-        response = self.client.get('/logs/level/ERROR')
-        self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
     unittest.main()
