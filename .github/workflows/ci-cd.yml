@@ -17,6 +17,14 @@ jobs:
           - property-service
           - notification-service
           - analytics-service
+          - inquiry-service
+          - project-service
+          - search-service
+          - reporting-service
+          - payment-service
+          - media-service
+          - logging-service
+          - api-gateway
     
     steps:
     - name: Checkout code
@@ -71,7 +79,7 @@ jobs:
     name: Build Docker Images
     runs-on: ubuntu-latest
     needs: [test, lint]
-    if: false  # Временно отключено - требуется настройка Docker Hub
+    if: github.event_name == 'push'
     
     steps:
     - name: Checkout code
